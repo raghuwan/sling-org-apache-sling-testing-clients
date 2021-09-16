@@ -468,11 +468,14 @@ public class AbstractSlingClient implements HttpClient, Closeable {
      * @throws ClientException if the request could not be executed
      */
     public  SlingHttpResponse doRequest(HttpUriRequest request, List<Header> headers, int... expectedStatus) throws ClientException {
+        log.info("AbstractSlingClient doRequest method, request : {}",request);
+        log.info("AbstractSlingClient doRequest method, headers : {}",headers);
+
         SlingHttpResponse response = doStreamRequest(request, headers, expectedStatus);
 
         // Consume entity and cache the content so the connection is closed
         response.getContent();
-
+        log.info("AbstractSlingClient doRequest method, response : {}", response);
         return response;
     }
 
