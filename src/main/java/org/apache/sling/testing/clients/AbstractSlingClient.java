@@ -316,20 +316,22 @@ public class AbstractSlingClient implements HttpClient, Closeable {
         }
 
         try {
-            log.debug("request {} {}", request.getMethod(), request.getURI());
+            log.debug("AbstractSlingClient doStreamRequest request {} {}", request.getMethod(), request.getURI());
             SlingHttpResponse response = new SlingHttpResponse(this.execute(request, context));
-            log.debug("response {}", HttpUtils.getHttpStatus(response));
+            log.debug("AbstractSlingClient doStreamRequest response {}", HttpUtils.getHttpStatus(response));
             // Check the status and throw a ClientException if it doesn't match expectedStatus, but close the entity before
             if (expectedStatus != null && expectedStatus.length > 0) {
                 try {
                     HttpUtils.verifyHttpStatus(response, expectedStatus);
                 } catch (ClientException e) {
                     // catch the exception to make sure we close the entity before re-throwing it
+                    log.error("ClientException in AbstractSlingClient doStreamRequest", e);
                     response.close();
                     throw e;
                 }
             }
 
+            log.debug("AbstractSlingClient doStreamRequest response content {}",response.getContent());
             return response;
         } catch (IOException e) {
             throw new ClientException("Could not execute http request", e);
@@ -468,17 +470,12 @@ public class AbstractSlingClient implements HttpClient, Closeable {
      * @throws ClientException if the request could not be executed
      */
     public  SlingHttpResponse doRequest(HttpUriRequest request, List<Header> headers, int... expectedStatus) throws ClientException {
-        log.info("AbstractSlingClient doRequest method, request : {}",request);
-        log.info("AbstractSlingClient doRequest method, request headers : {}",request.getAllHeaders());
-        log.info("AbstractSlingClient doRequest method, headers : {}",headers);
 
         SlingHttpResponse response = doStreamRequest(request, headers, expectedStatus);
 
         // Consume entity and cache the content so the connection is closed
         response.getContent();
-        log.info("AbstractSlingClient doRequest method, response content : {}", response.getContent());
-        log.info("AbstractSlingClient doRequest method, response headers : {}", response.getAllHeaders());
-        log.info("AbstractSlingClient doRequest method, response status : {}", response.getSlingStatus());
+
         return response;
     }
 
