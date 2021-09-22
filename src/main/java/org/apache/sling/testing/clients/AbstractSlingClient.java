@@ -317,6 +317,8 @@ public class AbstractSlingClient implements HttpClient, Closeable {
 
         try {
             log.info("AbstractSlingClient doStreamRequest request {} {}", request.getMethod(), request.getURI());
+            log.info("AbstractSlingClient doStreamRequest request headers {} {}", request.getAllHeaders());
+            log.info("AbstractSlingClient doStreamRequest header list {} {}", headers);
             SlingHttpResponse response = new SlingHttpResponse(this.execute(request, context));
             log.info("AbstractSlingClient doStreamRequest response {}", HttpUtils.getHttpStatus(response));
             // Check the status and throw a ClientException if it doesn't match expectedStatus, but close the entity before
@@ -332,6 +334,8 @@ public class AbstractSlingClient implements HttpClient, Closeable {
             }
 
             log.info("AbstractSlingClient doStreamRequest response content {}",response.getContent());
+            log.info("AbstractSlingClient doStreamRequest response status {}",response.getStatusLine().getStatusCode());
+            log.info("AbstractSlingClient doStreamRequest response header {}",response.getAllHeaders());
             return response;
         } catch (IOException e) {
             throw new ClientException("Could not execute http request", e);
